@@ -1746,10 +1746,16 @@ function buildMedia(p, i){
       wrap.innerHTML = '<div class="ph" style="color:#bbb;text-align:center;padding:20px">'+I.video+
         '<span>This browser can’t play that clip.<br>Re-save it as an H.264 .mp4 and add it again.</span></div>';
     });
+    /* getPlayable answers straight away for a plain file, and only later for a
+       baked-in one. The "did they close it already?" check must therefore apply
+       to the late answer only — the immediate one arrives before this node has
+       been put on the page at all. */
+    var mounted = false;
     getPlayable(m.src, function(url){
-      if(!v.isConnected) return;           /* viewer already moved on */
+      if(mounted && !v.isConnected) return;
       v.src = url; v.load(); start();
     });
+    mounted = true;
     return wrap;
   }
   wrap.innerHTML = '<img src="'+esc(m.src)+'" alt="" style="width:100%;height:100%;object-fit:contain">';
